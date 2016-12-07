@@ -8,7 +8,7 @@ I have been wanting to playing with the various LED strips available, and finall
 
 #### Coming Soon
 
-* Links to the [Instructables](http://instructables.com] page, once this written up more
+* Links to the [Instructables](http://instructables.com) page, once this written up more
 * Material List
 * More functions
 * Links for controlling this device via web and/or application
