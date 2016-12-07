@@ -8,45 +8,9 @@
 // v1.0 - Initial Project
 
 //#include "Options.h"	// NB: Change defines here to enable/disable features/modes, vary LED count, etc.
-#define USE_BLYNK
-#define USE_MMQT
-#define USE_ARDUINO_OTA
-
-#define NUM_LEDS 30
-#define LED_DATA_PIN 1
-
-// Override, to allow playing with part of a larger strip ... otherwise, simply match the NUM_LEDS setting to your strip instead
-#define ACTIVE_LEDS NUM_LEDS
-// Override, to set an initial reduced active LED count (default should be all)
-#define NUM_COLOURS ACTIVE_LEDS
-
-#ifdef USE_BLYNK
-//#define BLYNK_AUTH_TOKEN ""
-#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
-#endif  // USE_BLYNK
-
 // NB: For WifiManager info, see https://github.com/tzapu/WiFiManager
 
 const int aNumber = NUM_LEDS;
-
-#ifdef USE_BLYNK
-#define BLYNK_PRINT Serial
-#define BLYNK_MAX_SENDBYTES 256	// NB: Default is 128
-#include <ESP8266WiFi.h>
-#include <BlynkSimpleEsp8266.h>
-
-#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
-#define OFF_PIN V0
-#define TERMINAL_PIN V1
-#define RGB_PIN V2
-#define MENU_PIN V3
-#define RESTART_PIN V4
-#define LED_PIN V5
-#define BRIGHTNESS_PIN V6
-#define LIGHT_SENSOR_PIN V7
-#else  // If not USE_BLYNK
-#include <ESP8266WiFi.h>
-#endif // USE_BLYNK
 
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
@@ -240,54 +204,13 @@ void setup_ArduinoOTA()
 }
 #endif	// USE_ARDUINO_OTA
 
-String bsLink(String link) {
-  return "<a class=\"btn btn-success\" href=\"" + link + "\">" + link + "</a>";
-}
+// NB: These have been moved to WebServer.ino
+// String homepage;
+String bsLink(String link);
+String bsLink(String link) { return AppWebServer::bsLink(link); }
 
-void buildHomepage() {
-  homepage = "HTTP/1.1 200 OK";
-  homepage += "\r\nContent-Type: text/html";
-  homepage += "\r\n";
-  homepage += "\r\n<!DOCTYPE HTML>";
-  homepage += "\r\n<html>";
-  homepage += "\r\n<head>";
-  // homepage += "\r\n<link rel=\"icon\" href=\"data:;base64,=">"; // NB: Shortest version, but doesn't validate against HTML5, use this instead:-
-  // homepage += "\r\n<link rel=\"icon\" href=\"data:;base64,iVBORw0KGgo=\">";
-  homepage += "\r\n<link rel=\"icon\" href=\"data:,\">"; // NB: Apparently valid HTML5 and no IE <= 8 browser quirks!
-  homepage += "\r\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">";
-  homepage += "\r\n<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css\" integrity=\"sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi\" crossorigin=\"anonymous\">";
-  homepage += "\r\n</head>";
-  homepage += "\r\n<body>";
-  homepage += "\r\n<div class=\"container\">";
-  homepage += "\r\n<div class=\"jumbotron\">";
-  homepage += "\r\n<div class=\"lead\">WiFi LED</div>";
-  homepage += "\r\n<div>Try these links: <br/>";
-  homepage += "\r\n" + bsLink("/red");
-  homepage += "\r\n" + bsLink("/green");
-  homepage += "\r\n" + bsLink("/blue");
-  homepage += "\r\n" + bsLink("/black");
-  homepage += "\r\n" + bsLink("/white");
-  homepage += "\r\n" + bsLink("/purple");
-  homepage += "\r\n" + bsLink("/mixed");
-  homepage += "\r\n" + bsLink("/redgreen");
-  homepage += "\r\n" + bsLink("/rainbow");
-  homepage += "\r\n</div>";
-  homepage += "\r\n<div>";
-  homepage += "\r\n" + bsLink("/addled");
-  homepage += "\r\n" + bsLink("/removeled");
-  homepage += "\r\n" + bsLink("/restart");
-  homepage += "\r\n" + bsLink("/reset");
-  homepage += "\r\n" + bsLink("/clearwifi");
-  homepage += "\r\n</div>";
-  // Add Bootstrap JS
-  homepage += "\r\n</div>";
-  homepage += "\r\n<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js\" integrity=\"sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7\" crossorigin=\"anonymous\"></script>";
-  homepage += "\r\n<script src=\"https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.7/js/tether.min.js\" integrity=\"sha384-XTs3FgkjiBgo8qjEjBk0tGmf3wPrWtA6coPfQDfFEY8AnYJwjalXCiosYRBIBZX8\" crossorigin=\"anonymous\"></script>";
-  homepage += "\r\n<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js\" integrity=\"sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK\" crossorigin=\"anonymous\"></script>";
-  // End of Bootstrap JS
-  homepage += "\r\n</body>";
-  homepage += "\r\n</html>";
-}
+void buildHomepage();
+void buildHomepage() { return AppWebServer::buildHomepage(); }
 
 void flash(int cycles, int delayLength, struct CRGB colour) {
   for (int i = 0; i < cycles; i++) {
@@ -366,6 +289,13 @@ void setup() {
   Serial.begin(115200);
 
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
+
+  // Test use of #define in another .ino
+#ifdef TEST_TRUE
+  Serial.println("TEST_TRUE found, test passed");
+#else
+  Serial.println("TEST_TRUE not found, test failed");
+#endif
 
   // Setup LED strip
   FastLED.addLeds<NEOPIXEL, LED_DATA_PIN>(leds, NUM_LEDS);
