@@ -8,3 +8,4 @@ application.macosx
 .vs/
 Debug/
 __vm/
+*.backup
