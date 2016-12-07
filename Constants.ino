@@ -1,0 +1,32 @@
+const int COMMAND_NONE = 0;
+const int COMMAND_OFF = 1;
+const int COMMAND_ON = 2;
+const int COMMAND_CLEAR = COMMAND_OFF;
+const int COMMAND_WHITE = 3;
+const int COMMAND_RED = 4;
+const int COMMAND_GREEN = 5;
+const int COMMAND_BLUE = 6;
+const int COMMAND_PURPLE = 7;
+const int COMMAND_REDGREEN = 8;
+const int COMMAND_BLACK = COMMAND_OFF;
+const int COMMAND_MIXED = 9;
+const int COMMAND_CUSTOM_SINGLE = 10;
+const int COMMAND_CUSTOM_MIXED = 11;
+const int COMMAND_FLASH_ON = 12;
+const int COMMAND_FLASH_OFF = 13;
+const int COMMAND_CYCLE_ON = 14;
+const int COMMAND_CYCLE_OFF = 15;
+const int COMMAND_REMOVE_LED = 16;
+const int COMMAND_ADD_LED = 17;
+const int COMMAND_SAVE = 18;
+const int COMMAND_LOAD = 19;
+const int COMMAND_RAINBOW = 20;
+const int COMMAND_CUSTOM_RAINBOW = 21;
+const int COMMAND_RESTART = 22;
+const int COMMAND_CLEAR_WIFI = 23;
+const int COMMAND_SET_BRIGHTNESS = 24;
+const int COMMAND_DARKEN = 25;
+const int COMMAND_LIGHTEN = 26;
+const int COMMAND_RESET = 27;
+
+

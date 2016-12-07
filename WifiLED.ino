@@ -10,15 +10,11 @@
 //#include "Options.h"	// NB: Change defines here to enable/disable features/modes, vary LED count, etc.
 // NB: For WifiManager info, see https://github.com/tzapu/WiFiManager
 
-const int aNumber = NUM_LEDS;
+//const int aNumber = NUM_LEDS;
 
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
-
-//#define FASTLED_ESP8266_RAW_PIN_ORDER
-#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
-//#define FASTLED_ESP8266_D1_PIN_ORDER
 
 #include <FastLED.h>
 
@@ -30,37 +26,6 @@ const int aNumber = NUM_LEDS;
 
 //#include "Constants.cpp"
 //#include "Constants.h"
-const int COMMAND_NONE = 0;
-const int COMMAND_OFF = 1;
-const int COMMAND_ON = 2;
-const int COMMAND_CLEAR = COMMAND_OFF;
-const int COMMAND_WHITE = 3;
-const int COMMAND_RED = 4;
-const int COMMAND_GREEN = 5;
-const int COMMAND_BLUE = 6;
-const int COMMAND_PURPLE = 7;
-const int COMMAND_REDGREEN = 8;
-const int COMMAND_BLACK = COMMAND_OFF;
-const int COMMAND_MIXED = 9;
-const int COMMAND_CUSTOM_SINGLE = 10;
-const int COMMAND_CUSTOM_MIXED = 11;
-const int COMMAND_FLASH_ON = 12;
-const int COMMAND_FLASH_OFF = 13;
-const int COMMAND_CYCLE_ON = 14;
-const int COMMAND_CYCLE_OFF = 15;
-const int COMMAND_REMOVE_LED = 16;
-const int COMMAND_ADD_LED = 17;
-const int COMMAND_SAVE = 18;
-const int COMMAND_LOAD = 19;
-const int COMMAND_RAINBOW = 20;
-const int COMMAND_CUSTOM_RAINBOW = 21;
-const int COMMAND_RESTART = 22;
-const int COMMAND_CLEAR_WIFI = 23;
-const int COMMAND_SET_BRIGHTNESS = 24;
-const int COMMAND_DARKEN = 25;
-const int COMMAND_LIGHTEN = 26;
-const int COMMAND_RESET = 27;
-
 #ifdef USE_BLYNK
 const int BLYNK_MENU_OFF = 1;
 const int BLYNK_MENU_WHITE = 2;
@@ -287,15 +252,7 @@ void setup_EEPROM() {
 
 void setup() {
   Serial.begin(115200);
-
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
-
-  // Test use of #define in another .ino
-#ifdef TEST_TRUE
-  Serial.println("TEST_TRUE found, test passed");
-#else
-  Serial.println("TEST_TRUE not found, test failed");
-#endif
 
   // Setup LED strip
   FastLED.addLeds<NEOPIXEL, LED_DATA_PIN>(leds, NUM_LEDS);
@@ -362,7 +319,7 @@ void returnHomepage(WiFiClient client) {
 }
 
 bool started = false;
-int myVal = testVal;
+//int myVal = testVal;
 
 void update(int command) {
   Serial.print("In update: command=");
