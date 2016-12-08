@@ -7,10 +7,92 @@
 // v1.1 - Added FastLED and initial LED control
 // v1.0 - Initial Project
 
+///////////////// Helper, to allow organisation of .ino files by alphabet:- ///////////////////////
+void zzz_setup();
+void zzz_loop();
+///////////// End of Helper, to allow organisation of .ino files by alphabet:- ////////////////////
+
+
 //#include "Options.h"	// NB: Change defines here to enable/disable features/modes, vary LED count, etc.
 // NB: For WifiManager info, see https://github.com/tzapu/WiFiManager
 
 //const int aNumber = NUM_LEDS;
+
+///////////// Constants ///////////////
+const int COMMAND_NONE = 0;
+const int COMMAND_OFF = 1;
+const int COMMAND_ON = 2;
+const int COMMAND_CLEAR = COMMAND_OFF;
+const int COMMAND_WHITE = 3;
+const int COMMAND_RED = 4;
+const int COMMAND_GREEN = 5;
+const int COMMAND_BLUE = 6;
+const int COMMAND_PURPLE = 7;
+const int COMMAND_REDGREEN = 8;
+const int COMMAND_BLACK = COMMAND_OFF;
+const int COMMAND_MIXED = 9;
+const int COMMAND_CUSTOM_SINGLE = 10;
+const int COMMAND_CUSTOM_MIXED = 11;
+const int COMMAND_FLASH_ON = 12;
+const int COMMAND_FLASH_OFF = 13;
+const int COMMAND_CYCLE_ON = 14;
+const int COMMAND_CYCLE_OFF = 15;
+const int COMMAND_REMOVE_LED = 16;
+const int COMMAND_ADD_LED = 17;
+const int COMMAND_SAVE = 18;
+const int COMMAND_LOAD = 19;
+const int COMMAND_RAINBOW = 20;
+const int COMMAND_CUSTOM_RAINBOW = 21;
+const int COMMAND_RESTART = 22;
+const int COMMAND_CLEAR_WIFI = 23;
+const int COMMAND_SET_BRIGHTNESS = 24;
+const int COMMAND_DARKEN = 25;
+const int COMMAND_LIGHTEN = 26;
+const int COMMAND_RESET = 27;
+///////////////////////////////////////
+
+////////////// Defines ////////////////
+#define USE_BLYNK
+#define USE_MMQT
+#define USE_ARDUINO_OTA
+
+#define NUM_LEDS 30
+#define LED_DATA_PIN 1
+
+// Override, to allow playing with part of a larger strip ... otherwise, simply match the NUM_LEDS setting to your strip instead
+#define ACTIVE_LEDS NUM_LEDS
+// Override, to set an initial reduced active LED count (default should be all)
+#define NUM_COLOURS ACTIVE_LEDS
+
+#ifdef USE_BLYNK
+//#define BLYNK_AUTH_TOKEN ""
+#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
+#endif  // USE_BLYNK
+
+//#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+//#define FASTLED_ESP8266_D1_PIN_ORDER
+/////////// End of Defines ////////////
+
+/////////// Defines_Blynk /////////////
+#include <ESP8266WiFi.h>
+#ifdef USE_BLYNK
+#define BLYNK_PRINT Serial
+#define BLYNK_MAX_SENDBYTES 256  // NB: Default is 128
+#include <BlynkSimpleEsp8266.h>
+
+#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
+#define OFF_PIN V0
+#define TERMINAL_PIN V1
+#define RGB_PIN V2
+#define MENU_PIN V3
+#define RESTART_PIN V4
+#define LED_PIN V5
+#define BRIGHTNESS_PIN V6
+#define LIGHT_SENSOR_PIN V7
+#else  // If not USE_BLYNK
+#endif // USE_BLYNK
+//////// End of Defines_Blynk /////////
 
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
@@ -46,6 +128,7 @@ const int BLYNK_MENU_CLEAR_WIFI = 15;
 #endif  // #ifdef USE_BLYNK
 
 //#include "Settings.h"
+// NB: Change the SETTINGS_VALID definition to invalidate previous settings
 #define SETTINGS_VALID 123
 #define SETTINGS_INVALID 0xFE
 #define SETTINGS_EEPROM_OFFSET 512
@@ -64,13 +147,17 @@ struct Settings {
   bool autoSave;
 };
 
-
 /////////////////////////////////////
 // Function Declarations
 
-void setLEDs();
+//void setLEDs();
 
 /////////////////////////////////////
+// Globals
+String homepage;
+bool started = false;
+
+///////////////////////////////////
 
 #ifdef USE_BLYNK
 char blynkAuthToken[] = BLYNK_AUTH_TOKEN;
@@ -170,12 +257,14 @@ void setup_ArduinoOTA()
 #endif	// USE_ARDUINO_OTA
 
 // NB: These have been moved to WebServer.ino
+/*
 // String homepage;
 String bsLink(String link);
 String bsLink(String link) { return AppWebServer::bsLink(link); }
 
 void buildHomepage();
 void buildHomepage() { return AppWebServer::buildHomepage(); }
+*/
 
 void flash(int cycles, int delayLength, struct CRGB colour) {
   for (int i = 0; i < cycles; i++) {
@@ -252,6 +341,7 @@ void setup_EEPROM() {
 
 void setup() {
   Serial.begin(115200);
+  zzz_setup();
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
 
   // Setup LED strip
@@ -289,7 +379,8 @@ void setup() {
   setup_ArduinoOTA();
 #endif	// USE_ARDUINO_OTA
 
-  buildHomepage();
+  //buildHomepage();
+  //AppWebServer::buildHomepage();
 
   server.begin();
   Serial.print("HTTP server started - http://");
@@ -318,7 +409,6 @@ void returnHomepage(WiFiClient client) {
   delay(1);
 }
 
-bool started = false;
 //int myVal = testVal;
 
 void update(int command) {
@@ -515,7 +605,7 @@ void handleWiFiClient()
         setLEDs(CRGB::Purple);
         //setLEDs(CRGB::MediumSlateBlue);
       } else if (url == "/rainbow") {
-        Serial.println("Setting to rainbox");
+        Serial.println("Setting to rainbow");
         update(COMMAND_RAINBOW);
       } else if (url == "/favicon.ico") {
         Serial.println("ignored request for favicon.ico");
@@ -551,6 +641,7 @@ void handleWiFiClient()
 }
 
 void loop() {
+  zzz_loop();
 
 #ifdef USE_ARDUINO_OTA
   ArduinoOTA.handle();

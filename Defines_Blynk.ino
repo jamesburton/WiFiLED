@@ -1,3 +1,4 @@
+/*
 #include <ESP8266WiFi.h>
 #ifdef USE_BLYNK
 #define BLYNK_PRINT Serial
@@ -15,5 +16,4 @@
 #define LIGHT_SENSOR_PIN V7
 #else  // If not USE_BLYNK
 #endif // USE_BLYNK
-
-
+*/

@@ -1,4 +1,4 @@
-String homepage;
+//String homepage;
 
 namespace AppWebServer {
   String bsLink(String link) {

@@ -47,7 +47,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WiFi\src;D:\Google Drive\Development\Arduino\libraries\Blynk\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\DNSServer\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WebServer\src;D:\Google Drive\Development\Arduino\libraries\WiFiManager;D:\Google Drive\Development\Arduino\libraries\FastLED;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ArduinoOTA;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266mDNS;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\EEPROM;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ArduinoOTA\utility;D:\Google Drive\Development\Arduino\libraries\Blynk\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\DNSServer\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\EEPROM\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266mDNS\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WebServer\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WiFi\src\utility;D:\Google Drive\Development\Arduino\libraries\FastLED\utility;D:\Google Drive\Development\Arduino\libraries\WiFiManager\utility;C:\Program Files (x86)\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries;D:\Google Drive\Development\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\libb64;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\spiffs;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\umm_malloc;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\variants\nodemcu;D:\Google Drive\Arduino (1)\WiFiLED;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0/tools/sdk/include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0/tools/sdk/lwip/include;C:\Users\James\AppData\Local\Temp\VMBuilds\WiFiLED\esp8266_nodemcu/core;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\variants\nodemcu;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WiFi\src;D:\Google Drive\Development\Arduino\libraries\Blynk\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\DNSServer\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WebServer\src;D:\Google Drive\Development\Arduino\libraries\WiFiManager;D:\Google Drive\Development\Arduino\libraries\FastLED;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ArduinoOTA;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266mDNS;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\EEPROM;C:\Program Files (x86)\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries;G:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\vee5bknt.kh4\Micro Platforms\default\debuggers;D:\Google Drive\Development\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include\c++\4.8.2;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include\c++\4.8.2\xtensa-lx106-elf;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\lib\gcc\xtensa-lx106-elf\4.8.2\include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\tools\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WiFi\src;D:\Google Drive\Development\Arduino\libraries\Blynk\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\DNSServer\src;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WebServer\src;D:\Google Drive\Development\Arduino\libraries\WiFiManager;D:\Google Drive\Development\Arduino\libraries\FastLED;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ArduinoOTA;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266mDNS;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\EEPROM;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ArduinoOTA\utility;D:\Google Drive\Development\Arduino\libraries\Blynk\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\DNSServer\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\EEPROM\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WebServer\src\utility;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries\ESP8266WiFi\src\utility;D:\Google Drive\Development\Arduino\libraries\FastLED\utility;D:\Google Drive\Development\Arduino\libraries\WiFiManager\utility;C:\Program Files (x86)\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\libraries;D:\Google Drive\Development\Arduino\libraries;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\libb64;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\spiffs;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\cores\esp8266\umm_malloc;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\variants\nodemcu;D:\Google Drive\Arduino (1)\WiFiLED;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0/tools/sdk/include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0/tools/sdk/lwip/include;C:\Users\James\AppData\Local\Temp\VMBuilds\WiFiLED\esp8266_nodemcu/core;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include\c++\4.8.2;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include\c++\4.8.2\xtensa-lx106-elf;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\xtensa-lx106-elf\include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\1.20.0-26-gb404fb9-2\lib\gcc\xtensa-lx106-elf\4.8.2\include;C:\Users\James\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\2.3.0\tools\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>D:\Google Drive\Arduino (1)\WiFiLED\__vm\.WiFiLED.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__ESP8266_ESp8266__;__ESP8266_ESP8266__;__ets__;ICACHE_FLASH;F_CPU=80000000L;LWIP_OPEN_SRC;ARDUINO=106013;ARDUINO_ESP8266_NODEMCU;ARDUINO_ARCH_ESP8266;ESP8266;__cplusplus=201103L;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -74,21 +74,36 @@
     <ProjectCapability Include="VisualMicro" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Constants.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="Defines.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="Defines_Blynk.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="Globals.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="PostDefineConstants.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="Settings.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="WebServer.ino">
+      <FileType>CppCode</FileType>
+    </None>
     <None Include="WiFiLED.ino">
+      <FileType>CppCode</FileType>
+    </None>
+    <None Include="ZZZ_App.ino">
       <FileType>CppCode</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Constants.h" />
-    <ClInclude Include="Options.h" />
-    <ClInclude Include="Settings.h" />
-    <ClInclude Include="BlynkPins.h" />
     <ClInclude Include="__vm\.WiFiLED.vsarduino.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="BlynkPins.cpp" />
-    <ClCompile Include="Constants.cpp" />
-    <ClCompile Include="Settings.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
