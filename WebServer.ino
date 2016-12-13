@@ -1,10 +1,21 @@
 //String homepage;
 
 namespace AppWebServer {
+  String homepage;
+  
   WiFiServer server(80);
   
   String bsLink(String link) {
     return "<a class=\"btn btn-success\" href=\"" + link + "\">" + link + "</a>";
+  }
+  
+  void returnJSON(WiFiClient client, String json) {
+  client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: application/json");
+    client.println("");
+    client.println(json);
+    client.flush();
+    delay(1);
   }
   
   void buildHomepage() {
@@ -45,6 +56,8 @@ namespace AppWebServer {
     homepage += "\r\n" + bsLink("/clearwifi");
     homepage += "\r\n" + bsLink("/darken");
     homepage += "\r\n" + bsLink("/lighten");
+    homepage += "\r\n" + bsLink("/save");
+    homepage += "\r\n" + bsLink("/load");
     homepage += "\r\n</div>";
     // Add Bootstrap JS
     homepage += "\r\n</div>";
@@ -54,6 +67,12 @@ namespace AppWebServer {
     // End of Bootstrap JS
     homepage += "\r\n</body>";
     homepage += "\r\n</html>";
+  }
+
+  void returnHomepage(WiFiClient client) {
+    client.println(homepage);
+    client.flush();
+    delay(1);
   }
 
   void setupWebServer()
@@ -157,12 +176,17 @@ namespace AppWebServer {
           setLEDs(3, colours_mixed);
         } else if (url == "/purple") {
           Serial.println("Setting to purple");
-          //setLEDs(1, colours_purple);
           setLEDs(CRGB::Purple);
-          //setLEDs(CRGB::MediumSlateBlue);
         } else if (url == "/rainbow") {
           Serial.println("Setting to rainbow");
           update(COMMAND_RAINBOW);
+        } else if (url == "/save") {
+          //Serial.println("Saving settings");
+          update(COMMAND_SAVE);
+          Serial.println("COMMAND_SAVE completed");
+        } else if (url == "/load") {
+          //Serial.println("Loading settings");
+          update(COMMAND_LOAD);
         } else if (url == "/favicon.ico") {
           Serial.println("ignored request for favicon.ico");
           doNotReturnHomepage = true;

@@ -54,7 +54,7 @@ const int COMMAND_RRRGGGBBB = 29;
 ///////////////////////////////////////
 
 ////////////// Defines ////////////////
-#define USE_BLYNK
+//#define USE_BLYNK   // NB: Currently, this is crashing upon connect
 #define USE_MMQT
 #define USE_ARDUINO_OTA
 
@@ -107,29 +107,6 @@ const int COMMAND_RRRGGGBBB = 29;
 #endif // USE_ARDUINO_OTA
 
 #include <EEPROM.h>
-
-//#include "Constants.cpp"
-//#include "Constants.h"
-#ifdef USE_BLYNK
-const int BLYNK_MENU_OFF = 1;
-const int BLYNK_MENU_WHITE = 2;
-const int BLYNK_MENU_RAINBOW = 3;
-const int BLYNK_MENU_RED = 4;
-const int BLYNK_MENU_GREEN = 5;
-const int BLYNK_MENU_BLUE = 6;
-const int BLYNK_MENU_MIXED = 7;
-const int BLYNK_MENU_RED_GREEN = 8;
-const int BLYNK_MENU_RANDOM_RAINBOW = 9;
-const int BLYNK_MENU_RANDOM_RGB = 10;
-const int BLYNK_MENU_SAVE = 11;
-const int BLYNK_MENU_LOAD = 12;
-const int BLYNK_MENU_RESTART = 13;
-const int BLYNK_MENU_RESET = 14;
-const int BLYNK_MENU_CLEAR_WIFI = 15;
-//const int BLYNK_MENU_ = ;
-#endif  // #ifdef USE_BLYNK
-
-//#include "Settings.h"
 // NB: Change the SETTINGS_VALID definition to invalidate previous settings
 #define SETTINGS_VALID 123
 #define SETTINGS_INVALID 0xFE
@@ -154,23 +131,9 @@ struct Settings {
 /////////////////////////////////////
 // Function Declarations
 
-//void setLEDs();
-
 /////////////////////////////////////
 // Globals
-String homepage;
 bool started = false;
-
-///////////////////////////////////
-
-#ifdef USE_BLYNK
-char blynkAuthToken[] = BLYNK_AUTH_TOKEN;
-WidgetTerminal terminal(TERMINAL_PIN);
-#endif	// USE_BLYNK
-
-//struct Settings settings;
-
-int activeLEDs = ACTIVE_LEDS;
 
 int numColours = NUM_COLOURS;
 //CRGB leds[NUM_LEDS];
@@ -185,9 +148,24 @@ CRGB *remote_colour;
 int cycleIndex;
 int cycleCount;
 
-//String homepage;
-
 Settings settings;
+
+///////// Function Definitions ///////////////
+#ifdef USE_BLYNK
+void setup_blynk();
+void print_blynk(char *msg);
+void print_blynk(String msg);
+void print_blynk(int val);
+void print_blynk(byte val);
+void print_blynk(long val);
+void print_blynk(char val);
+void println_blynk(char *msg);
+void println_blynk(String msg);
+void println_blynk(int val);
+void println_blynk(byte val);
+void println_blynk(long val);
+void println_blynk(char val);
+#endif // USE_BLYNK
 
 void setupLEDs();
 void addLED();
@@ -204,86 +182,24 @@ void flash(int cycles, int delayLength, struct CRGB colour);
 void flash(int cycles, int delayLength);
 void flash();
 void set_rainbow(CRGB *colourArray, int numberToFill);
-/*
-void flash(int cycles, int delayLength, struct CRGB colour) {
-  for (int i = 0; i < cycles; i++) {
-    setLEDs(colour);
-    delay(delayLength);
-    setLEDs(CRGB::Black);
-    delay(delayLength);
-  }
-}
-void flash(int cycles, int delayLength) {
-  flash(cycles, delayLength, CRGB::White);
-}
-void flash() {
-  flash(1, 100);
-}
 
-void set_rainbow(CRGB *colourArray, int numberToFill) {
-  static int index[2];
-  index[0] = numberToFill / 3;
-  index[1] = (numberToFill * 2) / 3;
-  fill_gradient_RGB(colourArray, 0, CRGB::Red, index[0] - 1, CRGB::Green);
-  fill_gradient_RGB(colourArray, index[0], CRGB::Green, index[1] - 1, CRGB::Blue);
-  fill_gradient_RGB(colourArray, index[1], CRGB::Blue, settings.colours_count - 1, CRGB::Red);
-}
-*/
 void setDefaultSettings();  // Moved to Settings.ino
 void saveSettings();  // Moved to Settings.ino
+void loadSettings();  // Moved to Settings.ino
 
 void setup_EEPROM();  // Moved to EEPROM.ino
 
+void setup_colours(); // Moved to LEDRoutines.ino
+
 void setup() {
+  // Connect Serial output
   Serial.begin(115200);
   
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
+  // Call Main application setup routine (in zzz_App.ino)
   zzz_setup();
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
-  
-  // Set up colour ranges
-  colours_mixed[0] = CRGB::Blue;
-  colours_mixed[1] = CRGB::Green;
-  colours_mixed[2] = CRGB::Red;
-  colours_redgreen[0] = CRGB::Red;
-  colours_redgreen[1] = CRGB::Green;
-  colours_rrrggg[0] = colours_rrrggg[1] = colours_rrrggg[2] = CRGB::Red;
-  colours_rrrggg[3] = colours_rrrggg[4] = colours_rrrggg[5] = CRGB::Green;
-  colours_rrrgggbbb[0] = colours_rrrgggbbb[1] = colours_rrrgggbbb[2] = CRGB::Red;
-  colours_rrrgggbbb[3] = colours_rrrgggbbb[4] = colours_rrrgggbbb[5] = CRGB::Green;
-  colours_rrrgggbbb[6] = colours_rrrgggbbb[7] = colours_rrrgggbbb[8] = CRGB::Blue;
-
-  Serial.println("Setting to LightYellow to show it is live");
-  setLEDs(CRGB::LightYellow);
-
-#ifdef USE_ARDUINO_OTA
-  setup_ArduinoOTA();
-#endif	// USE_ARDUINO_OTA
-
-#ifdef USE_BLYNK
-  // Starting Blynk
-  //Blynk.begin(blynkAuthToken, WiFi.SSID(),
-  Blynk.config(blynkAuthToken);
-  //Blynk.begin(blynkAuthToken, WiFi.SSID().c_str(), WiFi.psk().c_str());
-#endif // USE_BLYNK
 }
-
-void returnJSON(WiFiClient client, String json) {
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: application/json");
-  client.println("");
-  client.println(json);
-  client.flush();
-  delay(1);
-}
-
-void returnHomepage(WiFiClient client) {
-  client.println(homepage);
-  client.flush();
-  delay(1);
-}
-
-//int myVal = testVal;
 
 void update(int command) {
   Serial.print("In update: command=");
@@ -293,8 +209,9 @@ void update(int command) {
       break;
     case COMMAND_OFF:
       //setLEDs(CRGB::Black);
-      settings.brightness = 0;
-      setLEDs();
+      //settings.brightness = 0;
+      //setLEDs();
+      setLEDs(CRGB::Black);
       break;
     /* NB: Not currently storing last value, can be re-added when that is available
       case COMMAND_ON:
@@ -359,29 +276,39 @@ void update(int command) {
       break;
     case COMMAND_SET_BRIGHTNESS:
       FastLED.setBrightness(settings.brightness);
+      FastLED.show();
       break;
     case COMMAND_DARKEN:
       settings.brightness = settings.brightness >= 8 ? settings.brightness - 8 : 0;
       update(COMMAND_SET_BRIGHTNESS);
+      break;
     case COMMAND_LIGHTEN:
       settings.brightness = settings.brightness < 247 ? settings.brightness + 8 : 255;
       update(COMMAND_SET_BRIGHTNESS);
+      break;
     case COMMAND_SAVE:
       Serial.println("COMMAND_SAVE: Saving settings to EEPROM");
       saveSettings();
 #ifdef USE_BLYNK
-      terminal.println("COMMAND_SAVE has not been implemented yet");
+      //terminal.println("COMMAND_SAVE has not been implemented yet");
+      Serial.println("Printing to Blynk");
+      println_blynk("COMMAND_SAVE has not been implemented yet");
 #endif	// USE_BLYNK
       break;
     case COMMAND_LOAD:
-      //Serial.println("COMMAND_LOAD has not been implemented yet");
-      Serial.println("COMMAND_LOAD: Load settings from EEPROM");
+      Serial.println("COMMAND_LOAD has not been implemented yet");
+      //Serial.println("COMMAND_LOAD: Load settings from EEPROM");
 #ifdef USE_BLYNK
-      terminal.println("COMMAND_LOAD has not been implemented yet");
+      Serial.println("Printing to Blynk");
+      //terminal.println("COMMAND_LOAD has not been implemented yet");
+      println_blynk("COMMAND_LOAD has not been implemented yet");
 #endif	// USE_BLYNK
       break;
     case COMMAND_RAINBOW:
-      Serial.println("Setting a rainbow");
+      //Serial.println("Setting a rainbow");
+      settings.colours_count = settings.activeLEDs;
+      Serial.print("Setting a rainbow, settings.colours_count=");
+      Serial.println(settings.colours_count);
       set_rainbow(settings.colours_custom, settings.colours_count);
       setLEDs(settings.colours_count, settings.colours_custom);
       break;
@@ -408,146 +335,4 @@ void loop_blynk();
 
 void loop() {
   zzz_loop();
-
-#ifdef USE_BLYNK
-  loop_blynk();
-#endif	// USE_BLYNK
-
-#ifdef USE_MQTT
-#endif	// USE_MQTT
-
-  //handleWiFiClient(); // NB: Now in zzz_loop, and then calling AppWebServer.handle in WebServer.ino
 }
-
-
-/* NB: Moved to Blynk.ino
-#ifdef USE_BLYNK
-/*
-BLYNK_CONNECTED()
-{
-	// Refetch/set all Blynk pin values
-	Blynk.syncAll();
-}
-//* /
-
-BLYNK_DISCONNECTED()
-{
-  started = false;
-}
-
-BLYNK_WRITE(OFF_PIN)
-{
-  Serial.print("Virtual Button 0 pressed");
-  int value = param.asInt();
-  bool bValue = value == 1;
-  Serial.print("... value = ");
-  Serial.println(bValue);
-  if (!bValue) {
-    update(COMMAND_OFF);
-  }
-}
-BLYNK_WRITE(TERMINAL_PIN)
-{
-  String value = param.asStr();
-  // NB: Can compared with String("Some Text") == param.asStr()
-  // OR: Can us a buffer to read and output, like this:
-  // terminal.write(param.getBuffer(), param.getLength());
-  terminal.print("RCV: ");
-  terminal.println(value);
-
-  terminal.flush();
-}
-
-BLYNK_WRITE(RGB_PIN)
-{
-  int r = param[0].asInt();
-  int g = param[1].asInt();
-  int b = param[2].asInt();
-  CRGB newColour = CRGB(r, g, b);
-  setLEDs(newColour);
-}
-
-BLYNK_WRITE(MENU_PIN)
-{
-  switch (param.asInt()) {
-    case BLYNK_MENU_OFF:
-      update(COMMAND_OFF);
-      break;
-    case BLYNK_MENU_WHITE:
-      update(COMMAND_WHITE);
-      break;
-    case BLYNK_MENU_RAINBOW:
-      update(COMMAND_RAINBOW);
-      break;
-    case BLYNK_MENU_RED:
-      update(COMMAND_RED);
-      break;
-    case BLYNK_MENU_GREEN:
-      update(COMMAND_GREEN);
-      break;
-    case BLYNK_MENU_BLUE:
-      update(COMMAND_BLUE);
-      break;
-    case BLYNK_MENU_MIXED:
-      update(COMMAND_MIXED);
-      break;
-    case BLYNK_MENU_RED_GREEN:
-      update(COMMAND_REDGREEN);
-      break;
-    case BLYNK_MENU_RANDOM_RAINBOW:
-      //update(COMMAND_RANDOM_RAINBOW);
-      Serial.println("BLYNK_MENU_RANDOM_RAINBOW received, but currently not implemented");
-      break;
-    case BLYNK_MENU_RANDOM_RGB:
-      //update(COMMAND_RANDOM_RAINBOW);
-      Serial.println("BLYNK_MENU_RANDOM_RGB received, but currently not implemented");
-      break;
-    case BLYNK_MENU_SAVE:
-      update(COMMAND_SAVE);
-      break;
-    case BLYNK_MENU_LOAD:
-      update(COMMAND_LOAD);
-      break;
-    case BLYNK_MENU_RESTART:
-      update(COMMAND_RESTART);
-      break;
-    case BLYNK_MENU_RESET:
-      update(COMMAND_RESET);
-      break;
-    case BLYNK_MENU_CLEAR_WIFI:
-      update(COMMAND_CLEAR_WIFI);
-      break;
-    default:
-      Serial.print("Unhandled Blynk menu item: ");
-      Serial.println(param.asInt());
-      break;
-  }
-}
-
-BLYNK_WRITE(RESTART_PIN)
-{
-  Serial.println("BLYNK: RESTART_PIN pressed");
-  update(COMMAND_RESTART);
-}
-
-// NB: LED_PIN is an output pin
-//BLYNK_WRITE(LED_PIN) { }
-
-BLYNK_WRITE(BRIGHTNESS_PIN)
-{
-  int brightness = param.asInt();
-  Serial.print("BLYNK: Brightness received: ");
-  Serial.println(brightness);
-  settings.brightness = brightness;
-  update(COMMAND_SET_BRIGHTNESS);
-}
-
-BLYNK_WRITE(LIGHT_SENSOR_PIN)
-{
-  int lux = param.asInt();
-  Serial.print("BLYNK: Light sensor value received: ");
-  Serial.println(lux);
-}
-#endif	// USE_BLYNK
-*/
-
