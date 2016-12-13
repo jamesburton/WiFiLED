@@ -1,3 +1,4 @@
+/*
 const int COMMAND_NONE = 0;
 const int COMMAND_OFF = 1;
 const int COMMAND_ON = 2;
@@ -28,5 +29,4 @@ const int COMMAND_SET_BRIGHTNESS = 24;
 const int COMMAND_DARKEN = 25;
 const int COMMAND_LIGHTEN = 26;
 const int COMMAND_RESET = 27;
-
-
+*/

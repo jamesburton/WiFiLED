@@ -7,10 +7,94 @@
 // v1.1 - Added FastLED and initial LED control
 // v1.0 - Initial Project
 
+///////////////// Helper, to allow organisation of .ino files by alphabet:- ///////////////////////
+void zzz_setup();
+void zzz_loop();
+///////////// End of Helper, to allow organisation of .ino files by alphabet:- ////////////////////
+
+
 //#include "Options.h"	// NB: Change defines here to enable/disable features/modes, vary LED count, etc.
 // NB: For WifiManager info, see https://github.com/tzapu/WiFiManager
 
 //const int aNumber = NUM_LEDS;
+
+///////////// Constants ///////////////
+const int COMMAND_NONE = 0;
+const int COMMAND_OFF = 1;
+const int COMMAND_ON = 2;
+const int COMMAND_CLEAR = COMMAND_OFF;
+const int COMMAND_WHITE = 3;
+const int COMMAND_RED = 4;
+const int COMMAND_GREEN = 5;
+const int COMMAND_BLUE = 6;
+const int COMMAND_PURPLE = 7;
+const int COMMAND_REDGREEN = 8;
+const int COMMAND_BLACK = COMMAND_OFF;
+const int COMMAND_MIXED = 9;
+const int COMMAND_CUSTOM_SINGLE = 10;
+const int COMMAND_CUSTOM_MIXED = 11;
+const int COMMAND_FLASH_ON = 12;
+const int COMMAND_FLASH_OFF = 13;
+const int COMMAND_CYCLE_ON = 14;
+const int COMMAND_CYCLE_OFF = 15;
+const int COMMAND_REMOVE_LED = 16;
+const int COMMAND_ADD_LED = 17;
+const int COMMAND_SAVE = 18;
+const int COMMAND_LOAD = 19;
+const int COMMAND_RAINBOW = 20;
+const int COMMAND_CUSTOM_RAINBOW = 21;
+const int COMMAND_RESTART = 22;
+const int COMMAND_CLEAR_WIFI = 23;
+const int COMMAND_SET_BRIGHTNESS = 24;
+const int COMMAND_DARKEN = 25;
+const int COMMAND_LIGHTEN = 26;
+const int COMMAND_RESET = 27;
+const int COMMAND_RRRGGG = 28;
+const int COMMAND_RRRGGGBBB = 29;
+///////////////////////////////////////
+
+////////////// Defines ////////////////
+#define USE_BLYNK
+#define USE_MMQT
+#define USE_ARDUINO_OTA
+
+#define NUM_LEDS 30
+#define LED_DATA_PIN 1
+
+// Override, to allow playing with part of a larger strip ... otherwise, simply match the NUM_LEDS setting to your strip instead
+#define ACTIVE_LEDS NUM_LEDS
+// Override, to set an initial reduced active LED count (default should be all)
+#define NUM_COLOURS ACTIVE_LEDS
+
+#ifdef USE_BLYNK
+//#define BLYNK_AUTH_TOKEN ""
+#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
+#endif  // USE_BLYNK
+
+//#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_ESP8266_NODEMCU_PIN_ORDER
+//#define FASTLED_ESP8266_D1_PIN_ORDER
+/////////// End of Defines ////////////
+
+/////////// Defines_Blynk /////////////
+#include <ESP8266WiFi.h>
+#ifdef USE_BLYNK
+#define BLYNK_PRINT Serial
+#define BLYNK_MAX_SENDBYTES 256  // NB: Default is 128
+#include <BlynkSimpleEsp8266.h>
+
+#define BLYNK_AUTH_TOKEN "ac2c04d72f3c4d89a2d1485ba422b6dd"
+#define OFF_PIN V0
+#define TERMINAL_PIN V1
+#define RGB_PIN V2
+#define MENU_PIN V3
+#define RESTART_PIN V4
+#define LED_PIN V5
+#define BRIGHTNESS_PIN V6
+#define LIGHT_SENSOR_PIN V7
+#else  // If not USE_BLYNK
+#endif // USE_BLYNK
+//////// End of Defines_Blynk /////////
 
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
@@ -46,9 +130,12 @@ const int BLYNK_MENU_CLEAR_WIFI = 15;
 #endif  // #ifdef USE_BLYNK
 
 //#include "Settings.h"
+// NB: Change the SETTINGS_VALID definition to invalidate previous settings
 #define SETTINGS_VALID 123
 #define SETTINGS_INVALID 0xFE
 #define SETTINGS_EEPROM_OFFSET 512
+
+#define SOFT_AP_NAME "WiFiLEDs"
 
 struct Settings {
   int valid;
@@ -64,13 +151,17 @@ struct Settings {
   bool autoSave;
 };
 
-
 /////////////////////////////////////
 // Function Declarations
 
-void setLEDs();
+//void setLEDs();
 
 /////////////////////////////////////
+// Globals
+String homepage;
+bool started = false;
+
+///////////////////////////////////
 
 #ifdef USE_BLYNK
 char blynkAuthToken[] = BLYNK_AUTH_TOKEN;
@@ -86,10 +177,10 @@ int numColours = NUM_COLOURS;
 CRGBArray<NUM_LEDS> leds;
 CRGB colours[NUM_COLOURS];
 CRGB colours_mixed[3];
-CRGB colours_redgreen[1];
+CRGB colours_redgreen[2];
+CRGB colours_rrrggg[6];
+CRGB colours_rrrgggbbb[9];
 CRGB *remote_colour;
-
-WiFiServer server(80);
 
 int cycleIndex;
 int cycleCount;
@@ -98,85 +189,22 @@ int cycleCount;
 
 Settings settings;
 
-void setLEDs() {
-  for (int i = 0; i < activeLEDs; i++) {
-    leds[i] = colours[cycleIndex + i % numColours];
-  }
-  FastLED.show();
-}
-
-void addLED() {
-  leds[activeLEDs] = colours[activeLEDs % numColours];
-  activeLEDs++;
-  FastLED.show();
-}
-
-void removeLED() {
-  if (activeLEDs > 0) {
-    activeLEDs--;
-    leds[activeLEDs] = CRGB::Black;
-  }
-  FastLED.show();
-}
-
-char buffer[100];
-void setLEDs(int newColourCount, struct CRGB newColours[])
-{
-  for (int i = 0; i < newColourCount; i++) {
-    sprintf(buffer, "newColours[%d]={%d,%d,%d}", i, newColours[i].r, newColours[i].g, newColours[i].b);
-    Serial.println(buffer);
-    colours[i] = newColours[i];
-  }
-  numColours = newColourCount;
-  setLEDs();
-}
-
-void setLEDs(struct CRGB colour) {
-  fill_solid(leds, activeLEDs, colour);
-  FastLED.show();
-}
+void setupLEDs();
+void addLED();
+void removeLED();
+void setLEDs();
+void setLEDs(int newColourCount, struct CRGB newColours[]);
+void setLEDs(struct CRGB colour);
 
 #ifdef USE_ARDUINO_OTA
-void setup_ArduinoOTA()
-{
-  // Port defaults to 8266
-  // ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
-  // ArduinoOTA.setHostname("myesp8266");
-
-  // No authentication by default
-  // ArduinoOTA.setPassword((const char *)"123");
-
-  ArduinoOTA.onStart([]() {
-    Serial.println("Start");
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
-  });
-  ArduinoOTA.begin();
-}
+void setup_ArduinoOTA();
 #endif	// USE_ARDUINO_OTA
 
-// NB: These have been moved to WebServer.ino
-// String homepage;
-String bsLink(String link);
-String bsLink(String link) { return AppWebServer::bsLink(link); }
-
-void buildHomepage();
-void buildHomepage() { return AppWebServer::buildHomepage(); }
-
+void flash(int cycles, int delayLength, struct CRGB colour);
+void flash(int cycles, int delayLength);
+void flash();
+void set_rainbow(CRGB *colourArray, int numberToFill);
+/*
 void flash(int cycles, int delayLength, struct CRGB colour) {
   for (int i = 0; i < cycles; i++) {
     setLEDs(colour);
@@ -200,87 +228,30 @@ void set_rainbow(CRGB *colourArray, int numberToFill) {
   fill_gradient_RGB(colourArray, index[0], CRGB::Green, index[1] - 1, CRGB::Blue);
   fill_gradient_RGB(colourArray, index[1], CRGB::Blue, settings.colours_count - 1, CRGB::Red);
 }
+*/
+void setDefaultSettings();  // Moved to Settings.ino
+void saveSettings();  // Moved to Settings.ino
 
-void setDefaultSettings() {
-  // Set default values
-  Serial.println("Setting default values");
-  settings.valid = SETTINGS_VALID;
-  settings.colours_count = NUM_LEDS;
-  settings.activeLEDs = NUM_LEDS;
-  settings.cycling = false;
-  settings.flashing = false;
-  //settings.password = ...;  // NB: Should consider encryption before adding this
-  settings.autoSave = true;
-  settings.brightness = 255;
-  set_rainbow(settings.colours_custom, settings.colours_count);
-}
-
-void saveSettings() {
-  EEPROM.put(SETTINGS_EEPROM_OFFSET, settings);
-  EEPROM.commit();
-  Serial.println("Settings saved to EEPROM");
-}
-
-void setup_EEPROM() {
-  int eepromSize = SETTINGS_EEPROM_OFFSET + sizeof(Settings);
-  EEPROM.begin(eepromSize);
-  // Check for obvious junk data in settings location, to handle as "No Settings"
-  byte firstByte;
-  EEPROM.get(SETTINGS_EEPROM_OFFSET, firstByte);
-  if (firstByte != 0x00 && firstByte != 0xFE) {
-    // The most obvious junk was not found, so attempt to load as settings
-    EEPROM.get(SETTINGS_EEPROM_OFFSET, settings);
-    // A specific value is set to show if this is valid, so read this to verify
-    // NB: If the structure changes, this SETTINGS_VALID constant should change to invalidate previous entries
-    if (settings.valid == SETTINGS_VALID) {
-      Serial.println("Loaded settings were valid");
-      flash(1, 500, CRGB::Green);
-    }
-    else {
-      Serial.println("Loaded settings were not valid");
-      flash(3, 250, CRGB::Red);
-    }
-  }
-  else {
-    Serial.println("No settings loaded");
-    flash(5, 200, CRGB::Orange);
-  }
-  if (settings.valid != SETTINGS_VALID) {
-    setDefaultSettings();
-  }
-}
+void setup_EEPROM();  // Moved to EEPROM.ino
 
 void setup() {
   Serial.begin(115200);
+  
   Serial.println("\r\n\r\n**********************************\r\n\r\n");
-
-  // Setup LED strip
-  FastLED.addLeds<NEOPIXEL, LED_DATA_PIN>(leds, NUM_LEDS);
-
-  //WiFiManager (Local intialization - Once its business is done, there is no need to keep it around)
-  WiFiManager wiFiManager;
-  // Reset settings - for testing
-  // wiFiManager.resetSettings();
-
-  //fetches ssid and pass from eeprom and tries to connect
-  //if it does not connect it starts an access point with the specified name
-  //and goes into a blocking loop awaiting configuration
-  wiFiManager.autoConnect("WiFiLEDs");
-  //or use this for auto generated name ESP + ChipID
-  //wiFiManager.autoConnect();
-
-  //if you get here you have connected to the WiFi
-  Serial.print("Connected to wifi, please browse to http://");
-  Serial.println(WiFi.localIP());
-
-  flash(3, 100);
-
+  zzz_setup();
+  Serial.println("\r\n\r\n**********************************\r\n\r\n");
+  
   // Set up colour ranges
   colours_mixed[0] = CRGB::Blue;
   colours_mixed[1] = CRGB::Green;
   colours_mixed[2] = CRGB::Red;
   colours_redgreen[0] = CRGB::Red;
   colours_redgreen[1] = CRGB::Green;
+  colours_rrrggg[0] = colours_rrrggg[1] = colours_rrrggg[2] = CRGB::Red;
+  colours_rrrggg[3] = colours_rrrggg[4] = colours_rrrggg[5] = CRGB::Green;
+  colours_rrrgggbbb[0] = colours_rrrgggbbb[1] = colours_rrrgggbbb[2] = CRGB::Red;
+  colours_rrrgggbbb[3] = colours_rrrgggbbb[4] = colours_rrrgggbbb[5] = CRGB::Green;
+  colours_rrrgggbbb[6] = colours_rrrgggbbb[7] = colours_rrrgggbbb[8] = CRGB::Blue;
 
   Serial.println("Setting to LightYellow to show it is live");
   setLEDs(CRGB::LightYellow);
@@ -288,12 +259,6 @@ void setup() {
 #ifdef USE_ARDUINO_OTA
   setup_ArduinoOTA();
 #endif	// USE_ARDUINO_OTA
-
-  buildHomepage();
-
-  server.begin();
-  Serial.print("HTTP server started - http://");
-  Serial.println(WiFi.localIP());
 
 #ifdef USE_BLYNK
   // Starting Blynk
@@ -318,7 +283,6 @@ void returnHomepage(WiFiClient client) {
   delay(1);
 }
 
-bool started = false;
 //int myVal = testVal;
 
 void update(int command) {
@@ -359,6 +323,12 @@ void update(int command) {
       break;
     case COMMAND_REDGREEN:
       setLEDs(2, colours_redgreen);
+      break;
+    case COMMAND_RRRGGG:
+      setLEDs(6, colours_rrrggg);
+      break;
+    case COMMAND_RRRGGGBBB:
+      setLEDs(9, colours_rrrgggbbb);
       break;
     case COMMAND_MIXED:
       setLEDs(3, colours_mixed);
@@ -434,158 +404,23 @@ void update(int command) {
   }
 }
 
-void handleWiFiClient()
-{
-  WiFiClient client = server.available();
-
-  bool available = false;
-  if (client) {
-    Serial.print("New client: ");
-    Serial.println(client.remoteIP());
-
-    // Wait until client is ready
-    const int clientDelay = 10;
-    int remainingWaits = 100;
-    while (!client.available() && remainingWaits-- > 0) {
-      delay(clientDelay);
-    }
-    if (client.available()) {
-      Serial.println("client available, continuing");
-      available = true;
-    } else {
-      client.stop();
-    }
-  }
-  if (available)
-  {
-    // Read the first line of the request
-    String request = client.readStringUntil('\r');
-    String url;  // null represents no match
-    bool doNotReturnHomepage = false;
-    Serial.println(request);
-    client.flush();
-
-    // NB: Request should be of this following format
-    // GET /somepath HTTP/1.1
-    if (request.startsWith("GET ")) {
-      url = request.substring(4);
-      int spacePos = url.indexOf(' ');
-      url = url.substring(0, spacePos);
-      Serial.print("Handling GET request: ");
-      Serial.println(url);
-    } else if (request.startsWith("POST ")) {
-      Serial.print("Unhandled POST request: ");
-      Serial.println(request.substring(5));
-    }
-
-    if (url) {
-      // Match the request
-      if (url == "/") {
-        Serial.println("Returning homepage only");
-      } else if (url == "/black") {
-        Serial.println("Setting to black");
-        //setLEDs(1, colours_black);
-        setLEDs(CRGB::Black);
-      } else if (url == "/white") {
-        Serial.println("Setting to white");
-        //setLEDs(1, colours_white);
-        setLEDs(CRGB::White);
-      } else if (url == "/blue") {
-        Serial.println("Setting to blue");
-        //setLEDs(1, colours_blue);
-        setLEDs(CRGB::Blue);
-      } else if (url == "/red") {
-        Serial.println("Setting to red");
-        //setLEDs(CRGB::Red);
-        //update(LEDCommands::Red);
-        update(COMMAND_RED);
-      } else if (url == "/green") {
-        Serial.println("Setting to green");
-        //setLEDs(1, colours_green);
-        setLEDs(CRGB::Green);
-      } else if (url == "/redgreen") {
-        Serial.println("Setting to red-green");
-        setLEDs(2, colours_redgreen);
-      } else if (url == "/mixed") {
-        Serial.println("Setting to mixed");
-        setLEDs(3, colours_mixed);
-      } else if (url == "/purple") {
-        Serial.println("Setting to purple");
-        //setLEDs(1, colours_purple);
-        setLEDs(CRGB::Purple);
-        //setLEDs(CRGB::MediumSlateBlue);
-      } else if (url == "/rainbow") {
-        Serial.println("Setting to rainbox");
-        update(COMMAND_RAINBOW);
-      } else if (url == "/favicon.ico") {
-        Serial.println("ignored request for favicon.ico");
-        doNotReturnHomepage = true;
-      } else if (url == "/addled") {
-        Serial.println("Adding LED");
-        addLED();
-      } else if (url == "/removeled") {
-        Serial.println("Removing LED");
-        removeLED();
-      } else if (url == "/clearwifi") {
-        Serial.println("Clearing WiFi");
-        WiFiManager wiFiManager;
-        wiFiManager.resetSettings();
-      } else if (url == "/restart") {
-        Serial.println("Restarting (soft-reboot)");
-        ESP.restart();
-      } else if (url == "/reset") {
-        Serial.println("Resetting (hard-reboot)");
-        ESP.reset();
-      } else {
-        Serial.print("Unhandled path: ");
-        Serial.println(url);
-        //client.stop();
-      }
-    }
-    if (!doNotReturnHomepage) {
-      returnHomepage(client);
-    }
-    client.flush();
-    client.stop();
-  }
-}
+void loop_blynk();
 
 void loop() {
-
-#ifdef USE_ARDUINO_OTA
-  ArduinoOTA.handle();
-#endif	// USE_ARDUINO_OTA
+  zzz_loop();
 
 #ifdef USE_BLYNK
-  Blynk.run();
-
-  if (Blynk.connected()) {
-    if (!started) {
-      // First connected set-up goes here
-      Serial.println("First connection to Blynk");
-      started = true;
-
-      // Clear Blynk terminal (which only stores last 25 messages)
-      for (int i = 0; i < 25; i++) {
-        terminal.println();
-      }
-
-      // Send connection info to Blynk terminal
-      //terminal.clear();	// NB: Currently, no such controls appears to exist
-      terminal.println("Device connected, and can be accessed here:");
-      terminal.print("http://");
-      terminal.println(WiFi.localIP());
-      terminal.flush();
-    }
-  }
+  loop_blynk();
 #endif	// USE_BLYNK
 
 #ifdef USE_MQTT
 #endif	// USE_MQTT
 
-  handleWiFiClient();
+  //handleWiFiClient(); // NB: Now in zzz_loop, and then calling AppWebServer.handle in WebServer.ino
 }
 
+
+/* NB: Moved to Blynk.ino
 #ifdef USE_BLYNK
 /*
 BLYNK_CONNECTED()
@@ -593,7 +428,7 @@ BLYNK_CONNECTED()
 	// Refetch/set all Blynk pin values
 	Blynk.syncAll();
 }
-//*/
+//* /
 
 BLYNK_DISCONNECTED()
 {
@@ -713,5 +548,6 @@ BLYNK_WRITE(LIGHT_SENSOR_PIN)
   Serial.print("BLYNK: Light sensor value received: ");
   Serial.println(lux);
 }
-//*/
 #endif	// USE_BLYNK
+*/
+

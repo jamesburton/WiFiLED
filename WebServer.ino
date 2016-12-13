@@ -1,6 +1,8 @@
-String homepage;
+//String homepage;
 
 namespace AppWebServer {
+  WiFiServer server(80);
+  
   String bsLink(String link) {
     return "<a class=\"btn btn-success\" href=\"" + link + "\">" + link + "</a>";
   }
@@ -31,6 +33,8 @@ namespace AppWebServer {
     homepage += "\r\n" + bsLink("/purple");
     homepage += "\r\n" + bsLink("/mixed");
     homepage += "\r\n" + bsLink("/redgreen");
+    homepage += "\r\n" + bsLink("/rrrggg");
+    homepage += "\r\n" + bsLink("/rrrgggbbb");
     homepage += "\r\n" + bsLink("/rainbow");
     homepage += "\r\n</div>";
     homepage += "\r\n<div>";
@@ -50,5 +54,145 @@ namespace AppWebServer {
     // End of Bootstrap JS
     homepage += "\r\n</body>";
     homepage += "\r\n</html>";
+  }
+
+  void setupWebServer()
+  {
+    buildHomepage();
+    //AppWebServer::buildHomepage();
+    
+    server.begin();
+    Serial.print("HTTP server started - http://");
+    Serial.println(WiFi.localIP());
+  }
+
+  void handle()
+  {
+    WiFiClient client = server.available();
+    //WiFiClient client = AppWebServer.server.available();
+  
+    bool available = false;
+    if (client) {
+      //Serial.print("New client: ");
+      //Serial.println(client.remoteIP());
+  
+      // Wait until client is ready
+      const int clientDelay = 10;
+      int remainingWaits = 100;
+      while (!client.available() && remainingWaits-- > 0) {
+        delay(clientDelay);
+      }
+      if (client.available()) {
+        //Serial.println("client available, continuing");
+        available = true;
+      } else {
+        client.stop();
+      }
+    }
+    if (available)
+    {
+      // Read the first line of the request
+      String request = client.readStringUntil('\r');
+      String url;  // null represents no match
+      bool doNotReturnHomepage = false;
+      Serial.println(request);
+      client.flush();
+  
+      // NB: Request should be of this following format
+      // GET /somepath HTTP/1.1
+      if (request.startsWith("GET ")) {
+        url = request.substring(4);
+        int spacePos = url.indexOf(' ');
+        url = url.substring(0, spacePos);
+        Serial.print("Handling GET request: ");
+        Serial.println(url);
+      } else if (request.startsWith("POST ")) {
+        Serial.print("Unhandled POST request: ");
+        Serial.println(request.substring(5));
+      }
+  
+      if (url) {
+        // Match the request
+        if (url == "/") {
+          Serial.println("Returning homepage only");
+        } else if (url == "/black") {
+          //Serial.println("Setting to black");
+          //setLEDs(1, colours_black);
+          //setLEDs(CRGB::Black);
+          update(COMMAND_BLACK);
+        } else if (url == "/white") {
+          //Serial.println("Setting to white");
+          //setLEDs(1, colours_white);
+          //setLEDs(CRGB::White);
+          update(COMMAND_WHITE);
+        } else if (url == "/blue") {
+          //Serial.println("Setting to blue");
+          //setLEDs(1, colours_blue);
+          //setLEDs(CRGB::Blue);
+          update(COMMAND_BLUE);
+        } else if (url == "/red") {
+          Serial.println("Setting to red");
+          //setLEDs(CRGB::Red);
+          //update(LEDCommands::Red);
+          update(COMMAND_RED);
+        } else if (url == "/green") {
+          //Serial.println("Setting to green");
+          //setLEDs(1, colours_green);
+          //setLEDs(CRGB::Green);
+          update(COMMAND_GREEN);
+        } else if (url == "/redgreen") {
+          //Serial.println("Setting to red-green");
+          //setLEDs(2, colours_redgreen);
+          update(COMMAND_REDGREEN);
+        } else if (url == "/rrrggg") {
+          Serial.println("Setting to rrr-ggg");
+          //setLEDs(6, colours_rrrggg);
+          update(COMMAND_RRRGGG);
+        } else if (url == "/rrrgggbbb") {
+          //Serial.println("Setting to rrr-ggg-bbb");
+          //setLEDs(2, colours_rrrgggbbb);
+          update(COMMAND_RRRGGGBBB);
+        } else if (url == "/mixed") {
+          Serial.println("Setting to mixed");
+          setLEDs(3, colours_mixed);
+        } else if (url == "/purple") {
+          Serial.println("Setting to purple");
+          //setLEDs(1, colours_purple);
+          setLEDs(CRGB::Purple);
+          //setLEDs(CRGB::MediumSlateBlue);
+        } else if (url == "/rainbow") {
+          Serial.println("Setting to rainbow");
+          update(COMMAND_RAINBOW);
+        } else if (url == "/favicon.ico") {
+          Serial.println("ignored request for favicon.ico");
+          doNotReturnHomepage = true;
+        } else if (url == "/addled") {
+          Serial.println("Adding LED");
+          addLED();
+        } else if (url == "/removeled") {
+          Serial.println("Removing LED");
+          removeLED();
+        } else if (url == "/clearwifi") {
+          Serial.println("Clearing WiFi");
+          WiFiManager wiFiManager;
+          wiFiManager.resetSettings();
+        } else if (url == "/restart") {
+          Serial.println("Restarting (soft-reboot)");
+          ESP.restart();
+        } else if (url == "/reset") {
+          Serial.println("Resetting (hard-reboot)");
+          ESP.reset();
+        } else {
+          Serial.print("Unhandled path: ");
+          Serial.println(url);
+          //client.stop();
+        }
+      }
+      if (!doNotReturnHomepage) {
+        returnHomepage(client);
+      }
+      client.flush();
+      client.stop();
+    }
   }
 }

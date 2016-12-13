@@ -1,3 +1,4 @@
+/*
 #define USE_BLYNK
 #define USE_MMQT
 #define USE_ARDUINO_OTA
@@ -18,5 +19,4 @@
 //#define FASTLED_ESP8266_RAW_PIN_ORDER
 #define FASTLED_ESP8266_NODEMCU_PIN_ORDER
 //#define FASTLED_ESP8266_D1_PIN_ORDER
-
-
+*/

@@ -15,34 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="WiFiLED.ino" />
+    <None Include="$safeprojectname$.ino" />
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="__vm\.WiFiLED.vsarduino.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BlynkPins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Constants.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BlynkPins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
+ 
 </Project>
